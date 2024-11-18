@@ -26,10 +26,10 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user){
+    public User create(@Valid @RequestBody User user) {
         logger.info("Добавление фильма");
 
-        if (user.getLogin().contains(" ")){
+        if (user.getLogin().contains(" ")) {
             logger.error("Ошибка добавления");
             throw new ValidationException("Логин не может содержать пробелы");
         }
@@ -37,7 +37,7 @@ public class UserController {
             logger.error("Ошибка при добавлении юзера");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        if (user.getName() == null || user.getName().isBlank()){
+        if (user.getName() == null || user.getName().isBlank()) {
             logger.info("Так как имя пустое, мы добавляем в поле логин");
             user.setName(user.getLogin());
         }
@@ -48,15 +48,15 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user){
+    public User update(@Valid @RequestBody User user) {
         logger.info("Начало внесение изменений в существующего пользователя");
-        if (user.getId() == null){
+        if (user.getId() == null) {
             logger.error("Ошибка при добавлении");
             throw new ValidationException("Нету id юзера");
         }
 
         User exisUser = users.get(user.getId());
-        if (exisUser == null){
+        if (exisUser == null) {
             logger.error("Ошибка обновления пользователя");
             throw new NotFoundException("Пользователь не найден");
         }
