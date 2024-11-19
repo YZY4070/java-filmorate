@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -20,10 +21,11 @@ public class Film {
     private String name;
 
 
+    @NotBlank
     @Size(max = 200, message = "Max длина описания 200 букв")
     private String description;
 
-
+    @NotNull
     private LocalDate releaseDate;
 
     @Positive
