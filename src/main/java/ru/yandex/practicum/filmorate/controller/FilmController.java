@@ -52,7 +52,7 @@ public class FilmController {
         }
         existingFilm.setName(film.getName()); //обновление имени
 
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) { // обновление даты выхода
+        if (film.getReleaseDate() != null && film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 28))) { // обновление даты выхода
             existingFilm.setReleaseDate(film.getReleaseDate());
             log.debug("Изменена дата релиза фильма с id {}", film.getId());
         }
