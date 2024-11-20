@@ -94,7 +94,7 @@ public class UserController {
         return nextId++;
     }
 
-    private boolean emailChecker (User user){
+    private boolean emailChecker(User user) {
         return users.values().stream()
                 .anyMatch(otherUser -> !otherUser.getId().equals(user.getId()) && otherUser.getEmail().equals(user.getEmail()));
     }
