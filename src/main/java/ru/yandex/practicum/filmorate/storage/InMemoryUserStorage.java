@@ -18,6 +18,7 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     protected int nextId = 1;
+    
 
     private boolean emailChecker(User user) {
         boolean emailExis = users.values().stream()
