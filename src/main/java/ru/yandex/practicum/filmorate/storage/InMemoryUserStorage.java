@@ -185,14 +185,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getCommonFriends(Long id, Long anotherId){
+    public Collection<User> getCommonFriends(Long id, Long anotherId) {
         log.info("Получение общих друзей");
         friendsChecker(id, anotherId);
 
         Set<Long> user = getUserById(id).getFriends();
         Set<Long> friend = getUserById(anotherId).getFriends();
 
-        if (friend.isEmpty() || user.isEmpty()){
+        if (friend.isEmpty() || user.isEmpty()) {
             throw new NotFoundException("Пользователи без друзей ;(");
         }
         return friend.stream().filter(user::contains).map(this::getUserById).toList();

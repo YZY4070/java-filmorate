@@ -35,12 +35,12 @@ public class FilmService {
     }
 
     public void addLike(Long id, Long userId) {
-        log.info("Добавление лайка");
+        //log.info("Добавление лайка");
         filmStorage.addLike(id, userId);
     }
 
     public void deleteLike(Long id, Long userId) {
-        log.info("Удаление лайка");
+        //log.info("Удаление лайка");
         filmStorage.deleteLike(id, userId);
     }
 }

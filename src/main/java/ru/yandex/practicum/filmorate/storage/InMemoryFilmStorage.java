@@ -15,8 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
-@Component @Slf4j
-public class InMemoryFilmStorage implements FilmStorage{
+@Component
+@Slf4j
+public class InMemoryFilmStorage implements FilmStorage {
 
     private final UserStorage userStorage;
     private final Map<Long, Film> filmMap = new HashMap<>();
@@ -33,12 +34,12 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public Collection<Film> getPopularFilms(Long count){
+    public Collection<Film> getPopularFilms(Long count) {
         if (count <= 0) throw new NegativeCountException("Число фильмов должно быть больше нуля");
         log.info("Получение популярных фильмов");
-      return filmMap.values().stream().sorted((film1, film2) -> (film2.getLikes().size() - film1.getLikes().size()))
-              .limit(count)
-              .toList();
+        return filmMap.values().stream().sorted((film1, film2) -> (film2.getLikes().size() - film1.getLikes().size()))
+                .limit(count)
+                .toList();
     }
 
     @Override
@@ -88,14 +89,14 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public Film getFilmById(Long id){
+    public Film getFilmById(Long id) {
         log.info("получение фильма по айди");
         if (filmMap.get(id) == null) throw new NotFoundException("Такого фильма не существует");
         return filmMap.get(id);
     }
 
     @Override
-    public void addLike(Long id, Long userId){
+    public void addLike(Long id, Long userId) {
         log.info("добавление лайка");
         userStorage.getUserById(userId); //внутри проверка на существование такого пользователя
         Film film = getFilmById(id);
@@ -103,11 +104,11 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public void deleteLike(Long id, Long userId){
+    public void deleteLike(Long id, Long userId) {
         log.info("удаление лайка");
         userStorage.getUserById(userId); //проверка на существование
         Film film = getFilmById(id);
-        if(!film.getLikes().contains(userId)) throw new NotFoundException("Пользователь не ставил лайк фильму");
+        if (!film.getLikes().contains(userId)) throw new NotFoundException("Пользователь не ставил лайк фильму");
         film.getLikes().remove(userId);
     }
 }
