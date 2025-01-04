@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
@@ -36,5 +37,5 @@ public class Film {
     @Positive
     private Integer duration;
 
-    private HashSet<Long> likes = new HashSet<>();
+    private Set<Long> likes = new HashSet<>();
 }

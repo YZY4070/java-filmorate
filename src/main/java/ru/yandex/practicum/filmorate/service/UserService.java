@@ -46,24 +46,6 @@ public class UserService {
         friend.getFriends().remove(id);
     }
 
-    public Collection<User> getFriends(Long id) {
-        log.info("Получение друзей пользователя");
-        if (id == null) {
-            throw new ValidationException("Id не указан");
-        }
-
-        if (!userStorage.getAllUsers().stream().anyMatch(user -> user.getId().equals(id))) {
-            throw new NotFoundException("Пользователь с данным не найден");
-        }
-        User user = userStorage.getUserById(id);
-
-        ArrayList<User> friends = new ArrayList<>();
-        for (Long friendId :user.getFriends()){
-            friends.add(userStorage.getUserById(friendId));
-        }
-        return friends;
-    }
-
     public Collection<User> getCommonFriends(Long id, Long anotherId) {
         log.info("Получение общих друзей");
         friendsChecker(id, anotherId);
@@ -75,9 +57,9 @@ public class UserService {
             throw new NotFoundException("Пользователи без друзей ;(");
         }
 
-        ArrayList<User> commonFrineds = new ArrayList<>();
-        for (Long userFriendsdId : userFriends){
-            if (friendFriends.contains(friendFriends)){
+        Collection<User> commonFrineds = new ArrayList<>();
+        for (Long userFriendsdId : userFriends) {
+            if (friendFriends.contains(userFriendsdId)) {
                 commonFrineds.add(userStorage.getUserById(userFriendsdId));
             }
         }
@@ -99,5 +81,34 @@ public class UserService {
             throw new FriendForHimselfException("Пользователь не может быть сам себе другом");
         }
     }
+
+    public Collection<User> getFriends(Long id) {
+        log.info("Получение друзей пользователя");
+
+        if (id == null) {
+            throw new ValidationException("Id не указан");
+        }
+
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Пользователь с данным id не найден");
+        }
+
+        Set<Long> friendIds = user.getFriends();
+        if (friendIds == null || friendIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        ArrayList<User> friends = new ArrayList<>();
+        for (Long friendId : friendIds) {
+            User friend = userStorage.getUserById(friendId);
+            if (friend != null) {
+                friends.add(friend);
+            }
+        }
+
+        return friends;
+    }
+
 
 }

@@ -106,5 +106,4 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Получение всех пользователей");
         return users.values();
     }
-
 }
