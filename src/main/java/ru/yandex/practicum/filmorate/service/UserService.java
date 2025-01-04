@@ -10,9 +10,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -20,11 +19,54 @@ import java.util.Set;
 public class UserService {
     private final UserStorage userStorage;
 
+    public User create(User user) {
+        if (user.getLogin().chars().anyMatch(Character::isWhitespace)) {
+            log.error("Ошибка добавления");
+            throw new ValidationException("Логин не может содержать пробелы");
+        }
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
+        if (emailChecker(user)) {
+            log.error("Ошибка добавления");
+            throw new ValidationException("Пользователь с такой почтой уже существует");
+        }
+        return userStorage.create(user);
+    }
+
+    public User update(User user) {
+        log.info("Начало внесение изменений в существующего пользователя");
+        if (user.getId() == null) {
+            log.error("Ошибка при добавлении");
+            throw new ValidationException("Нету id юзера");
+        }
+        User exisUser = userStorage.getUserById(user.getId());
+        if (exisUser == null) {
+            log.error("Ошибка обновления пользователя");
+            throw new NotFoundException("Пользователь не найден");
+        }
+        if (emailChecker(user)) {
+            log.error("Ошибка при обновлении данных юзера");
+            throw new ValidationException("Этот имейл уже используется");
+        }
+        return userStorage.update(user);
+    }
+
+    public User getUserById(Long id) {
+        if (userStorage.getUserById(id) == null) throw new NotFoundException("Такого пользователя не существует");
+        return userStorage.getUserById(id);
+    }
+
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers();
+    }
+
     public void addFriend(Long id, Long friendId) {
         log.info("Добавление друга");
         friendsChecker(id, friendId);
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
+        User user = getUserById(id);
+        User friend = getUserById(friendId);
 
         if (user.getFriends().contains(friendId)) {
             log.error("Уже друзья!");
@@ -39,8 +81,8 @@ public class UserService {
     public void deleteFriend(Long id, Long friendId) {
         log.info("удаление друга");
         friendsChecker(id, friendId);
-        User user = userStorage.getUserById(id);
-        User friend = userStorage.getUserById(friendId);
+        User user = getUserById(id);
+        User friend = getUserById(friendId);
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
@@ -66,49 +108,33 @@ public class UserService {
         return commonFrineds;
     }
 
+    public Collection<User> getFriends(Long id) {
+        log.info("Получение друзей пользователя");
+        return getUserById(id).getFriends()
+                .stream()
+                .map(this::getUserById)
+                .toList();
+    }
+
     private void friendsChecker(Long id, Long friendId) {
         if (id == null || friendId == null) {
             log.error("id пользователя или его друга не указан");
             throw new ValidationException("Id пользователя или друга должен быть указан");
         }
-        if (!userStorage.getAllUsers().contains(userStorage.getUserById(id)) ||
-                !userStorage.getAllUsers().contains(userStorage.getUserById(friendId))) {
-            log.error("Пользователя с данным id или его друга не существует");
-            throw new NotFoundException("Пользователь с данным id или его друга не найден");
-        }
+
+        userStorage.getUserById(id);
+        userStorage.getUserById(friendId);
+
         if (id.equals(friendId)) {
             log.error("id пользователя и друга идентичны");
             throw new FriendForHimselfException("Пользователь не может быть сам себе другом");
         }
     }
 
-    public Collection<User> getFriends(Long id) {
-        log.info("Получение друзей пользователя");
-
-        if (id == null) {
-            throw new ValidationException("Id не указан");
-        }
-
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            throw new NotFoundException("Пользователь с данным id не найден");
-        }
-
-        Set<Long> friendIds = user.getFriends();
-        if (friendIds == null || friendIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        ArrayList<User> friends = new ArrayList<>();
-        for (Long friendId : friendIds) {
-            User friend = userStorage.getUserById(friendId);
-            if (friend != null) {
-                friends.add(friend);
-            }
-        }
-
-        return friends;
+    private boolean emailChecker(User user) {
+        boolean emailExis = userStorage.getAllUsers().stream()
+                .anyMatch(otherUser -> !otherUser.getId().equals(user.getId()) && otherUser.getEmail().equals(user.getEmail()));
+        if (emailExis) throw new ValidationException("Пользователь с таким имейлом уже сущестует");
+        return false;
     }
-
-
 }
