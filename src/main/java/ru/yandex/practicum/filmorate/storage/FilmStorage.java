@@ -14,11 +14,4 @@ public interface FilmStorage {
     Film update(Film newFilm);
 
     Collection<Film> findAll();
-
-    Collection<Film> getPopularFilms(@Positive Long count);
-
-    void addLike(Long id, Long userId);
-
-    void deleteLike(Long id, Long userId);
-
 }

@@ -37,12 +37,4 @@ public class ErrorHandler {
     public ErrorResponse handleNegative(NegativeCountException e) {
         return new ErrorResponse("Need positive number", e.getMessage());
     }
-
-
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    public ErrorResponse handleNullPointer(NullPointerException e){
-//        return  new ErrorResponse("Передается пустое значение", e.getMessage());
-//    }
-
 }
