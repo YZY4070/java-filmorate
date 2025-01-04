@@ -57,7 +57,7 @@ public class FilmService {
         return filmStorage.update(film);
     }
 
-    public Film getFilmById(Long id){
+    public Film getFilmById(Long id) {
         if (filmStorage.getFilmById(id) == null) throw new NotFoundException("Такого фильма не существует");
         return filmStorage.getFilmById(id);
     }
