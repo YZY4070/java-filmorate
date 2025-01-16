@@ -32,6 +32,11 @@ public class UserService {
             log.error("Ошибка добавления");
             throw new ValidationException("Пользователь с такой почтой уже существует");
         }
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.debug("Так как имя пустое, мы добавляем в поле логин");
+            user.setName(user.getLogin());
+        }
+
         return userStorage.create(user);
     }
 
@@ -49,6 +54,10 @@ public class UserService {
         if (emailChecker(user)) {
             log.error("Ошибка при обновлении данных юзера");
             throw new ValidationException("Этот имейл уже используется");
+        }
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.debug("Добавляем логин если имя пустое");
+            user.setName(user.getLogin());
         }
         return userStorage.update(user);
     }

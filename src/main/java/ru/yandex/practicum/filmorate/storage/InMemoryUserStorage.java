@@ -19,12 +19,6 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User create(User user) {
         log.info("Добавление пользователя");
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.debug("Так как имя пустое, мы добавляем в поле логин");
-            user.setName(user.getLogin());
-        }
-
         user.setId(getNextId());
         users.put(user.getId(), user);
         log.info("Добавлен пользователь");
@@ -33,11 +27,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User update(User user) {
         User exisUser = users.get(user.getId());
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.debug("Добавляем логин если имя пустое");
-            user.setName(user.getLogin());
-        }
         exisUser = exisUser.toBuilder()
                 .email(user.getEmail())
                 .login(user.getLogin())

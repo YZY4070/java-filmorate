@@ -40,7 +40,7 @@ public class FilmService {
             log.error("Ошибка при обновлении: фильм с id {} не найден", film.getId());
             throw new NotFoundException("Фильм с id = " + film.getId() + " не найден");
         }
-        if (film.getReleaseDate() == null && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) { // обновление даты выхода
+        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) { // обновление даты выхода
             log.error("Фильм не может быть до 1895");
             throw new ValidationException("Ошибка валидации фильма");
         }
@@ -50,7 +50,7 @@ public class FilmService {
             throw new ValidationException("У фильма нет длительности");
         }
 
-        if (film.getDescription() == null && film.getDescription().isBlank()) { // обновление описания
+        if (film.getDescription() == null || film.getDescription().isBlank()) { // обновление описания
             log.error("У фильма не должно быть пустого описания");
             throw new ValidationException("Пустое описание");
         }
