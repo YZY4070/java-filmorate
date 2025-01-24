@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.repository.JdbcFilmRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 
@@ -17,7 +19,7 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
-    private final FilmService filmService;
+    private final JdbcFilmRepository filmService;
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -50,7 +52,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Удаление лайка");
-        filmService.deleteLike(id, userId);
+        filmService.removeLike(id, userId);
     }
 
     @GetMapping("/popular")

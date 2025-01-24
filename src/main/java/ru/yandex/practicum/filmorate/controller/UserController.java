@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.repository.JdbcFriendsRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
 
 import java.util.Collection;
 
@@ -15,7 +16,8 @@ import java.util.Collection;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final JdbcUserRepository userService;
+    private final JdbcFriendsRepository friendsService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -42,23 +44,23 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("Добавление друга");
-        userService.addFriend(id, friendId);
+        friendsService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("удаление друга");
-        userService.deleteFriend(id, friendId);
+        friendsService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public Collection<User> getFriends(@PathVariable Long id) {
-        return userService.getFriends(id);
+        return friendsService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
-        return userService.getCommonFriends(id, otherId);
+        return friendsService.getCommonFriends(id, otherId);
     }
 }

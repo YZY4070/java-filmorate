@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.FriendForHimselfException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.JdbcFriendsRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
@@ -17,7 +19,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserStorage userStorage;
+    private final JdbcUserRepository userRepository;
+    private final JdbcFriendsRepository friendsRepository;
 
     public User create(User user) {
         if (user.getLogin().chars().anyMatch(Character::isWhitespace)) {
@@ -37,7 +40,7 @@ public class UserService {
             user.setName(user.getLogin());
         }
 
-        return userStorage.create(user);
+        return userRepository.create(user);
     }
 
     public User update(User user) {
@@ -46,7 +49,7 @@ public class UserService {
             log.error("Ошибка при добавлении");
             throw new ValidationException("Нету id юзера");
         }
-        User exisUser = userStorage.getUserById(user.getId());
+        User exisUser = userRepository.getUserById(user.getId());
         if (exisUser == null) {
             log.error("Ошибка обновления пользователя");
             throw new NotFoundException("Пользователь не найден");
@@ -59,70 +62,60 @@ public class UserService {
             log.debug("Добавляем логин если имя пустое");
             user.setName(user.getLogin());
         }
-        return userStorage.update(user);
+        return userRepository.update(user);
     }
 
     public User getUserById(Long id) {
-        if (userStorage.getUserById(id) == null) throw new NotFoundException("Такого пользователя не существует");
-        return userStorage.getUserById(id);
+        if (userRepository.getUserById(id) == null) throw new NotFoundException("Такого пользователя не существует");
+        return userRepository.getUserById(id);
     }
 
     public Collection<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        return userRepository.getAllUsers();
     }
 
     public void addFriend(Long id, Long friendId) {
         log.info("Добавление друга");
         friendsChecker(id, friendId);
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
+        User user = userRepository.getUserById(id);
+        User friend = userRepository.getUserById(friendId);
 
         if (user.getFriends().contains(friendId)) {
             log.error("Уже друзья!");
             throw new AlreadyFriendsException("Пользователи уже друзья");
         }
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+        friendsRepository.addFriend(friendId, id);
     }
 
 
     public void deleteFriend(Long id, Long friendId) {
         log.info("удаление друга");
         friendsChecker(id, friendId);
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
+        User user = userRepository.getUserById(id);
+        User friend = userRepository.getUserById(friendId);
 
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
+        friendsRepository.removeFriend(friendId, id);
     }
 
     public Collection<User> getCommonFriends(Long id, Long anotherId) {
         log.info("Получение общих друзей");
         friendsChecker(id, anotherId);
 
-        Set<Long> userFriends = userStorage.getUserById(id).getFriends();
-        Set<Long> friendFriends = userStorage.getUserById(anotherId).getFriends();
+        Set<Long> userFriends = userRepository.getUserById(id).getFriends();
+        Set<Long> friendFriends = userRepository.getUserById(anotherId).getFriends();
 
         if (friendFriends.isEmpty() || userFriends.isEmpty()) {
             throw new NotFoundException("Пользователи без друзей ;(");
         }
 
-        Collection<User> commonFrineds = new ArrayList<>();
-        for (Long userFriendsdId : userFriends) {
-            if (friendFriends.contains(userFriendsdId)) {
-                commonFrineds.add(userStorage.getUserById(userFriendsdId));
-            }
-        }
-        return commonFrineds;
+        return friendsRepository.getCommonFriends(id, anotherId);
     }
 
     public Collection<User> getFriends(Long id) {
         log.info("Получение друзей пользователя");
-        return getUserById(id).getFriends()
-                .stream()
-                .map(this::getUserById)
-                .toList();
+       userRepository.getUserById(id);
+       return friendsRepository.getFriends(id);
     }
 
     private void friendsChecker(Long id, Long friendId) {
@@ -131,8 +124,8 @@ public class UserService {
             throw new ValidationException("Id пользователя или друга должен быть указан");
         }
 
-        userStorage.getUserById(id);
-        userStorage.getUserById(friendId);
+        userRepository.getUserById(id);
+        userRepository.getUserById(friendId);
 
         if (id.equals(friendId)) {
             log.error("id пользователя и друга идентичны");
@@ -141,7 +134,7 @@ public class UserService {
     }
 
     private boolean emailChecker(User user) {
-        boolean emailExis = userStorage.getAllUsers().stream()
+        boolean emailExis = userRepository.getAllUsers().stream()
                 .anyMatch(otherUser -> !otherUser.getId().equals(user.getId()) && otherUser.getEmail().equals(user.getEmail()));
         if (emailExis) throw new ValidationException("Пользователь с таким имейлом уже сущестует");
         return false;
