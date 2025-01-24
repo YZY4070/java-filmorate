@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 @Component
 public class UserMapper {
-    public static User transfromToUser(ResultSet resultSet, int rowNum) throws SQLException{
+    public static User transfromToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("user_id"))
                 .login(resultSet.getString("login"))

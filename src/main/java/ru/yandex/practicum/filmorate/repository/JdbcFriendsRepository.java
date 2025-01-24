@@ -22,8 +22,8 @@ public class JdbcFriendsRepository implements FriendsStorage {
         if (Objects.equals(userId, friendId)) throw new ValidationException("Нельяз добавить самого себя");
         String sql = "INSERT INTO friendships (user_id, friend_id) VALUES (?, ?)";
         try {
-            jdbc.update(sql, userId, friendId);
-        }catch (Exception e) {
+            jdbc.update(sql, friendId, userId);
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка добавления друга");
         }
@@ -33,8 +33,8 @@ public class JdbcFriendsRepository implements FriendsStorage {
     public void removeFriend(Long userId, Long friendId) {
         String sql = "DELETE FROM friendships WHERE user_id = ? AND friend_id = ?";
         try {
-            jdbc.update(sql, userId, friendId);
-        }catch (Exception e) {
+            jdbc.update(sql, friendId, userId);
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка удаления друга");
         }
@@ -45,8 +45,8 @@ public class JdbcFriendsRepository implements FriendsStorage {
                 "JOIN friendships as fs ON us.user_id = fs.friend_id " +
                 "WHERE fs.user_id = ?";
         try {
-            return jdbc.query(sql, UserMapper :: transfromToUser, userId);
-        }catch (Exception e) {
+            return jdbc.query(sql, UserMapper::transfromToUser, userId);
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка при получении друзей");
         }
@@ -57,9 +57,9 @@ public class JdbcFriendsRepository implements FriendsStorage {
                 "JOIN friendships AS fs1 ON us.user_id = fs1.friend_id " +
                 "JOIN friendships AS fs2 ON us.user_id = fs2.friend_id " +
                 "WHERE fs1.user_id = ? AND fs2.user_id = ?";
-        try{
-            return jdbc.query(sql, UserMapper :: transfromToUser, userId, otherUserId);
-        }catch (Exception e) {
+        try {
+            return jdbc.query(sql, UserMapper::transfromToUser, otherUserId, userId);
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка при получении общих друзей");
         }

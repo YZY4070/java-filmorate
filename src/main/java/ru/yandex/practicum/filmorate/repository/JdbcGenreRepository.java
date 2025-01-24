@@ -20,33 +20,33 @@ public class JdbcGenreRepository implements GenreStorage {
     private final JdbcTemplate jdbc;
 
     @Override
-    public Collection<Genre> getGenres(){
+    public Collection<Genre> getGenres() {
         String sql = "select * from genres";
         try {
             return jdbc.query(sql, GenreMapper::transformToGenre);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка возвращения всех жанров");
         }
     }
 
     @Override
-    public Genre getGenreById(Integer id){
+    public Genre getGenreById(Integer id) {
         String sql = "select * from genres where genre_id = ?";
-        try{
+        try {
             return jdbc.queryForObject(sql, GenreMapper::transformToGenre, id);
-        }catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             throw new NotFoundException("Жанра с таким id не существует");
         }
     }
 
-    public void genreChecker(HashSet<Genre> genres){
+    public void genreChecker(HashSet<Genre> genres) {
         String sql = "SELECT * FROM genres WHERE genre_id = ?";
-        if(genres.isEmpty() || genres == null) return;
+        if (genres.isEmpty() || genres == null) return;
         try {
             genres.forEach(genre -> jdbc.queryForObject(sql, GenreMapper::transformToGenre, genre.getId()));
-        }catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             throw new ValidationException("Жанр с данным id не найден");
         }

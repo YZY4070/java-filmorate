@@ -16,11 +16,11 @@ public class MpaService {
         return mpaRepository.getAll();
     }
 
-    public Mpa getMpaById(int id){
+    public Mpa getMpaById(int id) {
         return mpaRepository.getMpaById(id);
     }
 
-    public void mpaChecker(Integer id){
+    public void mpaChecker(Integer id) {
         mpaRepository.mpaChecker(id);
     }
 }

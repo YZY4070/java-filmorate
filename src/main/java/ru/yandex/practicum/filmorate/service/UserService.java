@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.JdbcFriendsRepository;
 import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -105,17 +104,13 @@ public class UserService {
         Set<Long> userFriends = userRepository.getUserById(id).getFriends();
         Set<Long> friendFriends = userRepository.getUserById(anotherId).getFriends();
 
-        if (friendFriends == null || userFriends == null) {
-            throw new NotFoundException("Пользователи без друзей ;(");
-        }
-
         return friendsRepository.getCommonFriends(id, anotherId);
     }
 
     public Collection<User> getFriends(Long id) {
         log.info("Получение друзей пользователя");
-       userRepository.getUserById(id);
-       return friendsRepository.getFriends(id);
+        userRepository.getUserById(id);
+        return friendsRepository.getFriends(id);
     }
 
     private void friendsChecker(Long id, Long friendId) {

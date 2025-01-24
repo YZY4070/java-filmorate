@@ -46,7 +46,7 @@ public class UserController {
         if (id == null || friendId == null) {
             throw new ValidationException("ID пользователя или друга не может быть null");
         }
-        if (userService.getUserById(id) == null|| userService.getUserById(friendId) == null) {
+        if (userService.getUserById(id) == null || userService.getUserById(friendId) == null) {
             throw new NotFoundException("Пользователь не найден");
         }
         userService.addFriend(id, friendId);

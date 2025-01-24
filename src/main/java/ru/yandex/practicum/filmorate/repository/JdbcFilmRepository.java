@@ -27,21 +27,21 @@ public class JdbcFilmRepository implements FilmStorage {
     private final JdbcTemplate jdbc;
     private final JdbcMpaRepository mpaRepository;
 
-    private HashSet<Genre> getFilmGenre(Long id){
+    private HashSet<Genre> getFilmGenre(Long id) {
         String sql = "SELECT g.genre_id, g.name " +
                 "FROM film_genres fg " +
                 "JOIN genres g ON fg.genre_id = g.genre_id " +
                 "WHERE fg.film_id = ? " +
                 "ORDER BY fg.genre_id ASC";
         try {
-            return new HashSet<>(Objects.requireNonNull(jdbc.query(sql, GenreMapper :: transformToGenre, id)));
-        }catch (Exception e){
+            return new HashSet<>(Objects.requireNonNull(jdbc.query(sql, GenreMapper::transformToGenre, id)));
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalError("Со списком жанров что-то не так");
         }
     }
 
-    private void addGenre(Film film){
+    private void addGenre(Film film) {
         String deleteGenre = "DELETE FROM film_genres WHERE film_id = ?";
         String insertGenre = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         try {
@@ -53,12 +53,13 @@ public class JdbcFilmRepository implements FilmStorage {
                     preparedStatement.setLong(1, film.getId());
                     preparedStatement.setInt(2, genreSet.get(i).getId());
                 }
+
                 @Override
                 public int getBatchSize() {
                     return genreSet.size();
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка добавления жанра");
         }
@@ -69,7 +70,7 @@ public class JdbcFilmRepository implements FilmStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "INSERT INTO films(name, description, release_date, duration, mpa_raiting_id)" +
                 "VALUES (?, ?, ?, ?, ?)";
-        try{
+        try {
             jdbc.update(con -> {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, film.getName());
@@ -83,7 +84,7 @@ public class JdbcFilmRepository implements FilmStorage {
             film.setId(id);
             addGenre(film);
             return film;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка создания фильма");
         }
@@ -98,12 +99,12 @@ public class JdbcFilmRepository implements FilmStorage {
                 "WHERE f.film_id = ? ";
         try {
             return jdbc.queryForObject(sql, ((resultSet, rowNum) -> {
-                        Film film = FilmMapper.transformToFilm(resultSet, rowNum);
-                        film.setGenres(getFilmGenre(id));
-                        film.setMpa(mpaRepository.getMpaById(film.getMpa().getId()));
-                        return film;
+                Film film = FilmMapper.transformToFilm(resultSet, rowNum);
+                film.setGenres(getFilmGenre(id));
+                film.setMpa(mpaRepository.getMpaById(film.getMpa().getId()));
+                return film;
             }), id);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new NotFoundException("Фильм не найден!");
         }
@@ -117,7 +118,7 @@ public class JdbcFilmRepository implements FilmStorage {
                     film.getMpa().getId(), film.getId());
             addGenre(film);
             return getFilmById(film.getId());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка при добавлении фильма");
         }
@@ -129,32 +130,32 @@ public class JdbcFilmRepository implements FilmStorage {
                 "m.name AS mpa_name " +
                 "FROM films f " +
                 "JOIN mpaRaiting m ON f.mpa_raiting_id = m.mpa_raiting_id";
-        try{
+        try {
             List<Film> films = jdbc.query(sql, FilmMapper::transformToFilm);
             films.forEach(f -> f.setGenres(getFilmGenre(f.getId())));
             return films;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка получения всех фильмов");
         }
     }
 
-    public void addLike(Long filmId, Long userId ) {
+    public void addLike(Long filmId, Long userId) {
         String sql = "INSERT INTO likes (user_id, film_id) VALUES (?, ?)";
         try {
             jdbc.update(sql, userId, filmId);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка при добавлении лайка");
         }
     }
 
-    public void removeLike(Long filmId, Long userId ) {
+    public void removeLike(Long filmId, Long userId) {
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-        if(getFilmById(filmId).getLikes() == null || getFilmById(filmId).getLikes().isEmpty()) return;
-        try{
+        if (getFilmById(filmId).getLikes() == null || getFilmById(filmId).getLikes().isEmpty()) return;
+        try {
             jdbc.update(sql, filmId, userId);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка при удалении лайка");
         }
@@ -169,11 +170,11 @@ public class JdbcFilmRepository implements FilmStorage {
                 "GROUP BY f.film_id, m.mpa_raiting_id, m.name " +
                 "ORDER BY likes_count DESC " +
                 "LIMIT ?";
-        try{
+        try {
             List<Film> films = jdbc.query(sql, FilmMapper::transformToFilm, count);
             films.forEach(f -> f.setGenres(getFilmGenre(f.getId())));
             return films;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка при получении популярных фильмов");
         }

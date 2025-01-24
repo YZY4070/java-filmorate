@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -14,8 +12,6 @@ import ru.yandex.practicum.filmorate.repository.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.repository.JdbcGenreRepository;
 import ru.yandex.practicum.filmorate.repository.JdbcMpaRepository;
 import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -104,7 +100,7 @@ public class FilmService {
     }
 
     public Mpa getMpaById(Integer id) {
-       return mpaRepository.getMpaById(id);
+        return mpaRepository.getMpaById(id);
     }
 
     public Collection<Mpa> getMpas() {

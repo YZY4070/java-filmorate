@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS genres
 -- Таблица для дружбы между пользователями
 CREATE TABLE IF NOT EXISTS friendships
 (
-    user_id       INT NOT NULL,
-    friend_id     INT NOT NULL,
+    user_id   INT NOT NULL,
+    friend_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     FOREIGN KEY (friend_id) REFERENCES users (user_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, friend_id)

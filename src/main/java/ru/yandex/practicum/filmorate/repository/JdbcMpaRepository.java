@@ -19,35 +19,35 @@ public class JdbcMpaRepository implements MpaStorage {
     private final JdbcTemplate jdbc;
 
     @Override
-     public Collection<Mpa> getAll(){
+    public Collection<Mpa> getAll() {
         String sql = "select * from mparaiting";
-        try{
+        try {
             return jdbc.query(sql, MpaMapper::transformToMpa);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Ошибка получения рейтинга");
         }
     }
 
     @Override
-    public Mpa getMpaById(int id){
+    public Mpa getMpaById(int id) {
         String sqlNotfound = "SELECT COUNT(mpa_raiting_id) FROM mparaiting";
         Integer count = jdbc.queryForObject(sqlNotfound, Integer.class);
         if (id > count) throw new NotFoundException("Такого мпа нет!");
         String sql = "select * from mparaiting where mpa_raiting_id = ?";
-        try{
+        try {
             return jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("Ошибка получения рейтинга по id " + id);
         }
     }
 
-    public void mpaChecker(Integer id){
+    public void mpaChecker(Integer id) {
         String sql = "select * from mparaiting where mpa_raiting_id = ?";
-        try{
+        try {
             jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
-        }catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             throw new ValidationException("Mpa с таким id " + id + " не сущесвует");
         }
