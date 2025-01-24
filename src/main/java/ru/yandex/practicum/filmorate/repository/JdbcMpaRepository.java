@@ -17,7 +17,7 @@ public class JdbcMpaRepository implements MpaStorage {
 
     @Override
     public Collection<Mpa> getAll(){
-        String sql = "select * from mpa";
+        String sql = "select * from mparaiting";
         try{
             return jdbc.query(sql, MpaMapper::transformToMpa);
         }catch(Exception e){
@@ -28,7 +28,7 @@ public class JdbcMpaRepository implements MpaStorage {
 
     @Override
     public Mpa getMpaById(int id){
-        String sql = "select * from mpa where id = ?";
+        String sql = "select * from mparaiting where mpa_raiting_id = ?";
         try{
             return jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
         }catch(Exception e){
@@ -38,7 +38,7 @@ public class JdbcMpaRepository implements MpaStorage {
     }
 
     public void mpaChecker(Integer id){
-        String sql = "select * from mpa where id = ?";
+        String sql = "select * from mparaiting where mpa_raiting_id = ?";
         try{
             jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
         }catch (Exception e){

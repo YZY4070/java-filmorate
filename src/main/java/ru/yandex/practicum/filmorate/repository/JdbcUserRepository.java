@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -15,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,7 +49,7 @@ public class JdbcUserRepository implements UserStorage {
 
     @Override
     public User update(User newUser){
-        String sql = "UPDATE users SET login = ?, email = ?, birthday = ?, name = ? WHERE id = ?";
+        String sql = "UPDATE users SET login = ?, email = ?, birthday = ?, name = ? WHERE user_id = ?";
         getUserById(newUser.getId());
         try{
             jdbc.update(sql, newUser.getLogin(), newUser.getEmail(), newUser.getBirthday().toString(), newUser.getName(),newUser.getId());
@@ -59,12 +62,17 @@ public class JdbcUserRepository implements UserStorage {
 
     @Override
     public User getUserById(Long id){
-        try {
-            String sql = "select * from users where id = ?";
-            return jdbc.queryForObject(sql, UserMapper::transfromToUser, id);
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new InternalServerException("Пользователь с таким id не найден: " + id);
+        Optional<User> resultUser;
+        String sql = "select * from users where user_id = ?";
+        try{
+            resultUser = Optional.ofNullable(jdbc.queryForObject(sql, UserMapper :: transfromToUser, id));
+        }catch (EmptyResultDataAccessException e){
+            resultUser = Optional.empty();
+        }
+        if (resultUser.isPresent()){
+            return resultUser.get();
+        }else {
+            throw new NotFoundException("Пользователь с таким id = " + id + " не найден!");
         }
     }
 

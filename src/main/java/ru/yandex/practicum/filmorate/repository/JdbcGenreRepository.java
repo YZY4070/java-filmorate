@@ -19,7 +19,7 @@ public class JdbcGenreRepository implements GenreStorage {
 
     @Override
     public Collection<Genre> getGenres(){
-        String sql = "select * from genre";
+        String sql = "select * from genres";
         try {
             return jdbc.query(sql, GenreMapper::transformToGenre);
         }catch (Exception e) {
@@ -30,7 +30,7 @@ public class JdbcGenreRepository implements GenreStorage {
 
     @Override
     public Genre getGenreById(Integer id){
-        String sql = "select * from genre where id = ?";
+        String sql = "select * from genres where genre_id = ?";
         try{
             return jdbc.queryForObject(sql, GenreMapper::transformToGenre, id);
         }catch (Exception e) {
@@ -40,9 +40,9 @@ public class JdbcGenreRepository implements GenreStorage {
     }
 
     public void genreChecker(HashSet<Genre> genres){
-        String sql = "select * from genre";
+        String sql = "SELECT * FROM genres WHERE genre_id = ?";
         try {
-            genres.forEach(genre -> jdbc.query(sql, GenreMapper::transformToGenre));
+            genres.forEach(genre -> jdbc.queryForObject(sql, GenreMapper::transformToGenre, genre.getId()));
         }catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException("?");

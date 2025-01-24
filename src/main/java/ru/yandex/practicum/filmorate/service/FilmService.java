@@ -78,9 +78,7 @@ public class FilmService {
 
     public Collection<Film> getPopularFilms(Long count) {
         log.info("Получение популярных фильмов");
-        return filmRepository.findAll().stream().sorted((film1, film2) -> (film2.getLikes().size() - film1.getLikes().size()))
-                .limit(count)
-                .toList();
+        return filmRepository.getPopularFilms(count);
     }
 
     public void addLike(Long id, Long userId) {

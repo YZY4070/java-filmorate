@@ -15,7 +15,7 @@ import java.util.Collection;
 @RequestMapping("/genres")
 @RequiredArgsConstructor
 public class GenreController {
-    private JdbcGenreRepository genreRepository;
+    private final JdbcGenreRepository genreRepository;
 
     @GetMapping
     public Collection<Genre> getAllGenres() {

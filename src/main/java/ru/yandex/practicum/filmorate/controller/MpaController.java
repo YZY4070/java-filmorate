@@ -14,7 +14,7 @@ import java.util.Collection;
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
 public class MpaController {
-    private JdbcMpaRepository mpaRepository;
+    private final JdbcMpaRepository mpaRepository;
 
     @GetMapping
     public Collection<Mpa> getAllMpa() {

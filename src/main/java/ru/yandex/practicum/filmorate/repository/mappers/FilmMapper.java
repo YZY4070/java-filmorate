@@ -11,10 +11,10 @@ import java.sql.SQLException;
 public class FilmMapper {
     public static Film transformToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
-                .id(resultSet.getLong("id"))
+                .id(resultSet.getLong("film_id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("realease_date").toLocalDate())
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .mpa(new Mpa(resultSet.getInt("mpa_raiting_id"), resultSet.getString("name")))
                 .build();

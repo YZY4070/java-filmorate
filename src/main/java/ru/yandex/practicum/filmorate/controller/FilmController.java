@@ -19,7 +19,7 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
-    private final JdbcFilmRepository filmService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -52,7 +52,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Удаление лайка");
-        filmService.removeLike(id, userId);
+        filmService.deleteLike(id, userId);
     }
 
     @GetMapping("/popular")

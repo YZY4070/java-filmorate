@@ -80,7 +80,7 @@ public class UserService {
         User user = userRepository.getUserById(id);
         User friend = userRepository.getUserById(friendId);
 
-        if (user.getFriends().contains(friendId)) {
+        if (user.getFriends() != null && user.getFriends().equals(friend)) {
             log.error("Уже друзья!");
             throw new AlreadyFriendsException("Пользователи уже друзья");
         }

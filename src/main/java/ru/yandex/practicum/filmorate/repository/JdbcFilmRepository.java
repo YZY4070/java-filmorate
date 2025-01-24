@@ -108,7 +108,7 @@ public class JdbcFilmRepository implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_raiting_id = ? WHERE id = ?";
+        String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_raiting_id = ? WHERE film_id = ?";
         try {
             jdbc.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
                     film.getMpa().getId(), film.getId());
