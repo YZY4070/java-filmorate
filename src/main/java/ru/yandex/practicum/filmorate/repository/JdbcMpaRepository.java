@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.repository.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
@@ -16,7 +19,7 @@ public class JdbcMpaRepository implements MpaStorage {
     private final JdbcTemplate jdbc;
 
     @Override
-    public Collection<Mpa> getAll(){
+     public Collection<Mpa> getAll(){
         String sql = "select * from mparaiting";
         try{
             return jdbc.query(sql, MpaMapper::transformToMpa);
@@ -28,6 +31,9 @@ public class JdbcMpaRepository implements MpaStorage {
 
     @Override
     public Mpa getMpaById(int id){
+        String sqlNotfound = "SELECT COUNT(mpa_raiting_id) FROM mparaiting";
+        Integer count = jdbc.queryForObject(sqlNotfound, Integer.class);
+        if (id > count) throw new NotFoundException("Такого мпа нет!");
         String sql = "select * from mparaiting where mpa_raiting_id = ?";
         try{
             return jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
@@ -41,9 +47,9 @@ public class JdbcMpaRepository implements MpaStorage {
         String sql = "select * from mparaiting where mpa_raiting_id = ?";
         try{
             jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
-        }catch (Exception e){
+        }catch (EmptyResultDataAccessException e){
             e.printStackTrace();
-            throw new InternalServerException("?");
+            throw new ValidationException("Mpa с таким id " + id + " не сущесвует");
         }
     }
 }

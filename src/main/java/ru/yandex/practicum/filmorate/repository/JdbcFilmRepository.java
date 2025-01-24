@@ -25,12 +25,14 @@ import java.util.*;
 public class JdbcFilmRepository implements FilmStorage {
 
     private final JdbcTemplate jdbc;
+    private final JdbcMpaRepository mpaRepository;
 
     private HashSet<Genre> getFilmGenre(Long id){
         String sql = "SELECT g.genre_id, g.name " +
                 "FROM film_genres fg " +
                 "JOIN genres g ON fg.genre_id = g.genre_id " +
-                "WHERE fg.film_id = ?";
+                "WHERE fg.film_id = ? " +
+                "ORDER BY fg.genre_id ASC";
         try {
             return new HashSet<>(Objects.requireNonNull(jdbc.query(sql, GenreMapper :: transformToGenre, id)));
         }catch (Exception e){
@@ -89,15 +91,16 @@ public class JdbcFilmRepository implements FilmStorage {
 
     @Override
     public Film getFilmById(Long id) {
-        String sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_raiting_id, " +
+        String sql = "SELECT f.film_id, f.name as film_name, f.description, f.release_date, f.duration, f.mpa_raiting_id, " +
                 "m.name AS mpa_name " +
                 "FROM films f " +
                 "JOIN mpaRaiting m ON f.mpa_raiting_id = m.mpa_raiting_id " +
-                "WHERE f.film_id = ?";
+                "WHERE f.film_id = ? ";
         try {
             return jdbc.queryForObject(sql, ((resultSet, rowNum) -> {
                         Film film = FilmMapper.transformToFilm(resultSet, rowNum);
                         film.setGenres(getFilmGenre(id));
+                        film.setMpa(mpaRepository.getMpaById(film.getMpa().getId()));
                         return film;
             }), id);
         }catch (Exception e){
@@ -137,9 +140,9 @@ public class JdbcFilmRepository implements FilmStorage {
     }
 
     public void addLike(Long filmId, Long userId ) {
-        String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
+        String sql = "INSERT INTO likes (user_id, film_id) VALUES (?, ?)";
         try {
-            jdbc.update(sql, filmId, userId);
+            jdbc.update(sql, userId, filmId);
         }catch (Exception e){
             e.printStackTrace();
             throw new InternalServerException("Ошибка при добавлении лайка");
@@ -148,6 +151,7 @@ public class JdbcFilmRepository implements FilmStorage {
 
     public void removeLike(Long filmId, Long userId ) {
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
+        if(getFilmById(filmId).getLikes() == null || getFilmById(filmId).getLikes().isEmpty()) return;
         try{
             jdbc.update(sql, filmId, userId);
         }catch (Exception e){

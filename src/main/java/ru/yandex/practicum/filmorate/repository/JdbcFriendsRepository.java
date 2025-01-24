@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,6 +19,7 @@ public class JdbcFriendsRepository implements FriendsStorage {
 
     @Override
     public void addFriend(Long userId, Long friendId) {
+        if (Objects.equals(userId, friendId)) throw new ValidationException("Нельяз добавить самого себя");
         String sql = "INSERT INTO friendships (user_id, friend_id) VALUES (?, ?)";
         try {
             jdbc.update(sql, userId, friendId);

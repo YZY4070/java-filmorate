@@ -105,7 +105,7 @@ public class UserService {
         Set<Long> userFriends = userRepository.getUserById(id).getFriends();
         Set<Long> friendFriends = userRepository.getUserById(anotherId).getFriends();
 
-        if (friendFriends.isEmpty() || userFriends.isEmpty()) {
+        if (friendFriends == null || userFriends == null) {
             throw new NotFoundException("Пользователи без друзей ;(");
         }
 

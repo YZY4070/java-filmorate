@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerErrorException;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -37,4 +38,8 @@ public class ErrorHandler {
     public ErrorResponse handleNegative(NegativeCountException e) {
         return new ErrorResponse("Need positive number", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleServerError(InternalServerException e) {return new ErrorResponse("Internal server error", e.getMessage());}
 }

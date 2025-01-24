@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -89,9 +91,7 @@ public class FilmService {
 
     public void deleteLike(Long id, Long userId) {
         log.info("удаление лайка");
-        userRepository.getUserById(userId); //проверка на существование
-        Film film = filmRepository.getFilmById(id);
-        if (!film.getLikes().contains(userId)) throw new NotFoundException("Пользователь не ставил лайк фильму");
+        userRepository.getUserById(userId); //проверка на существование;
         filmRepository.removeLike(id, userId);
     }
 
