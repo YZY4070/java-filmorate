@@ -48,7 +48,7 @@ public class JdbcGenreRepository implements GenreStorage {
             genres.forEach(genre -> jdbc.queryForObject(sql, GenreMapper::transformToGenre, genre.getId()));
         } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
-            throw new ValidationException("Жанр с данным id не найден");
+            throw new NotFoundException("Жанр с данным id не найден");
         }
     }
 }

@@ -49,7 +49,7 @@ public class JdbcMpaRepository implements MpaStorage {
         try {
             jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ValidationException("Mpa с таким id " + id + " не сущесвует");
+            throw new NotFoundException("Mpa с таким id " + id + " не сущесвует");
         }
     }
 }
