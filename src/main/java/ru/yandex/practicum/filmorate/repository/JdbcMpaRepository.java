@@ -29,6 +29,7 @@ public class JdbcMpaRepository implements MpaStorage {
         }
     }
 
+
     @Override
     public Mpa getMpaById(int id) {
         String sqlNotfound = "SELECT COUNT(mpa_raiting_id) FROM mpa_rating";
