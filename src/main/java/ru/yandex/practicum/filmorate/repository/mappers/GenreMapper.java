@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class GenreMapper {
     public static Genre transformToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         Genre genre = new Genre();
-        genre.setId(resultSet.getInt("genre_id"));
+        genre.setId(resultSet.getLong("genre_id"));
         genre.setName(resultSet.getString("name"));
         return genre;
     }

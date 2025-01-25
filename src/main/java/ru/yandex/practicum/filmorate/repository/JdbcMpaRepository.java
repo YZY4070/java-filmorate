@@ -20,7 +20,7 @@ public class JdbcMpaRepository implements MpaStorage {
 
     @Override
     public Collection<Mpa> getAll() {
-        String sql = "select * from mparaiting";
+        String sql = "select * from mpa_rating";
         try {
             return jdbc.query(sql, MpaMapper::transformToMpa);
         } catch (Exception e) {
@@ -31,10 +31,10 @@ public class JdbcMpaRepository implements MpaStorage {
 
     @Override
     public Mpa getMpaById(int id) {
-        String sqlNotfound = "SELECT COUNT(mpa_raiting_id) FROM mparaiting";
+        String sqlNotfound = "SELECT COUNT(mpa_raiting_id) FROM mpa_rating";
         Integer count = jdbc.queryForObject(sqlNotfound, Integer.class);
-        if (id > count) throw new NotFoundException("Такого мпа нет!");
-        String sql = "select * from mparaiting where mpa_raiting_id = ?";
+        if (id > count || count == null) throw new NotFoundException("Такого мпа нет!");
+        String sql = "select * from mpa_rating where mpa_raiting_id = ?";
         try {
             return jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
         } catch (Exception e) {
@@ -44,11 +44,10 @@ public class JdbcMpaRepository implements MpaStorage {
     }
 
     public void mpaChecker(Integer id) {
-        String sql = "select * from mparaiting where mpa_raiting_id = ?";
+        String sql = "select * from mpa_rating where mpa_raiting_id = ?";
         try {
             jdbc.queryForObject(sql, MpaMapper::transformToMpa, id);
         } catch (EmptyResultDataAccessException e) {
-            e.printStackTrace();
             throw new ValidationException("Mpa с таким id " + id + " не сущесвует");
         }
     }

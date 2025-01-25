@@ -50,7 +50,7 @@ public class JdbcFilmRepository implements FilmStorage {
                 @Override
                 public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                     preparedStatement.setLong(1, film.getId());
-                    preparedStatement.setInt(2, genreSet.get(i).getId());
+                    preparedStatement.setLong(2, genreSet.get(i).getId());
                 }
 
                 @Override
@@ -94,7 +94,7 @@ public class JdbcFilmRepository implements FilmStorage {
         String sql = "SELECT f.film_id, f.name as film_name, f.description, f.release_date, f.duration, f.mpa_raiting_id, " +
                 "m.name AS mpa_name " +
                 "FROM films f " +
-                "JOIN mpaRaiting m ON f.mpa_raiting_id = m.mpa_raiting_id " +
+                "JOIN mpa_rating m ON f.mpa_raiting_id = m.mpa_raiting_id " +
                 "WHERE f.film_id = ? ";
         try {
             return jdbc.queryForObject(sql, ((resultSet, rowNum) -> {
@@ -128,7 +128,7 @@ public class JdbcFilmRepository implements FilmStorage {
         String sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_raiting_id, " +
                 "m.name AS mpa_name " +
                 "FROM films f " +
-                "JOIN mpaRaiting m ON f.mpa_raiting_id = m.mpa_raiting_id";
+                "JOIN mpa_rating m ON f.mpa_raiting_id = m.mpa_raiting_id";
         try {
             List<Film> films = jdbc.query(sql, FilmMapper::transformToFilm);
             films.forEach(f -> f.setGenres(getFilmGenre(f.getId())));
@@ -165,7 +165,7 @@ public class JdbcFilmRepository implements FilmStorage {
                 "m.name AS mpa_name, COUNT(l.film_id) AS likes_count " +
                 "FROM films f " +
                 "LEFT JOIN likes l ON f.film_id = l.film_id " +
-                "JOIN mpaRaiting m ON f.mpa_raiting_id = m.mpa_raiting_id " +
+                "JOIN mpa_rating m ON f.mpa_raiting_id = m.mpa_raiting_id " +
                 "GROUP BY f.film_id, m.mpa_raiting_id, m.name " +
                 "ORDER BY likes_count DESC " +
                 "LIMIT ?";

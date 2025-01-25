@@ -14,15 +14,15 @@ import java.util.Collection;
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
 public class MpaController {
-    private final MpaService mpaRepository;
+    private final MpaService mpaService;
 
     @GetMapping
     public Collection<Mpa> getAllMpa() {
-        return mpaRepository.getAll();
+        return mpaService.getAll();
     }
 
     @GetMapping("/{id}")
     public Mpa getMpaById(@PathVariable int id) {
-        return mpaRepository.getMpaById(id);
+        return mpaService.getMpaById(id);
     }
 }

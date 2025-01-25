@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.repository.JdbcFilmRepository;
 import ru.yandex.practicum.filmorate.repository.JdbcGenreRepository;
 import ru.yandex.practicum.filmorate.repository.JdbcMpaRepository;
@@ -65,12 +63,11 @@ public class FilmService {
         }
         genreRepository.genreChecker(film.getGenres());
         mpaRepository.mpaChecker(film.getMpa().getId());
-        filmRepository.getFilmById(film.getId());
+
         return filmRepository.update(film);
     }
 
     public Film getFilmById(Long id) {
-        //if (filmRepository.getFilmById(id) == null) throw new NotFoundException("Такого фильма не существует");
         return filmRepository.getFilmById(id);
     }
 
@@ -90,21 +87,4 @@ public class FilmService {
         userRepository.getUserById(userId); //проверка на существование;
         filmRepository.removeLike(id, userId);
     }
-
-    public Genre getGenreById(Integer id) {
-        return genreRepository.getGenreById(id);
-    }
-
-    public Collection<Genre> getGenres() {
-        return genreRepository.getGenres();
-    }
-
-    public Mpa getMpaById(Integer id) {
-        return mpaRepository.getMpaById(id);
-    }
-
-    public Collection<Mpa> getMpas() {
-        return mpaRepository.getAll();
-    }
-
 }

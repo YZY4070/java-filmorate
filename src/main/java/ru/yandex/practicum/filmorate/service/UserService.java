@@ -74,12 +74,18 @@ public class UserService {
     }
 
     public void addFriend(Long id, Long friendId) {
+        if (id == null || friendId == null) {
+            throw new ValidationException("ID пользователя или друга не может быть null");
+        }
+        if (getUserById(id) == null || getUserById(friendId) == null) {
+            throw new NotFoundException("Пользователь не найден");
+        }
         log.info("Добавление друга");
         friendsChecker(id, friendId);
         User user = userRepository.getUserById(id);
         User friend = userRepository.getUserById(friendId);
 
-        if (user.getFriends() != null && user.getFriends().equals(friend)) {
+        if (user.getFriends() != null && user.getFriends().contains(friend.getId())) {
             log.error("Уже друзья!");
             throw new AlreadyFriendsException("Пользователи уже друзья");
         }
@@ -91,19 +97,16 @@ public class UserService {
     public void deleteFriend(Long id, Long friendId) {
         log.info("удаление друга");
         friendsChecker(id, friendId);
-        User user = userRepository.getUserById(id);
-        User friend = userRepository.getUserById(friendId);
-
+        userRepository.getUserById(id);
+        userRepository.getUserById(friendId);
         friendsRepository.removeFriend(friendId, id);
     }
 
     public Collection<User> getCommonFriends(Long id, Long anotherId) {
         log.info("Получение общих друзей");
         friendsChecker(id, anotherId);
-
-        Set<Long> userFriends = userRepository.getUserById(id).getFriends();
-        Set<Long> friendFriends = userRepository.getUserById(anotherId).getFriends();
-
+        userRepository.getUserById(id);
+        userRepository.getUserById(anotherId);
         return friendsRepository.getCommonFriends(id, anotherId);
     }
 

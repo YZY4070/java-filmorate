@@ -15,15 +15,15 @@ import java.util.Collection;
 @RequestMapping("/genres")
 @RequiredArgsConstructor
 public class GenreController {
-    private final GenreService genreRepository;
+    private final GenreService genreService;
 
     @GetMapping
     public Collection<Genre> getAllGenres() {
-        return genreRepository.getGenres();
+        return genreService.getGenres();
     }
 
     @GetMapping("/{id}")
     public Genre getGenreById(@PathVariable int id) {
-        return genreRepository.getGenreById(id);
+        return genreService.getGenreById(id);
     }
 }

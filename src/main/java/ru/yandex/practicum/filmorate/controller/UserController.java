@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -43,12 +41,6 @@ public class UserController {
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        if (id == null || friendId == null) {
-            throw new ValidationException("ID пользователя или друга не может быть null");
-        }
-        if (userService.getUserById(id) == null || userService.getUserById(friendId) == null) {
-            throw new NotFoundException("Пользователь не найден");
-        }
         userService.addFriend(id, friendId);
     }
 
