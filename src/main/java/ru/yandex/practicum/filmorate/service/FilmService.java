@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.repository.JdbcFilmRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcGenreRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcMpaRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -15,11 +18,13 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class FilmService {
-    private final InMemoryFilmStorage filmStorage;
-    private final UserService userService;
+    private final JdbcFilmRepository filmRepository;
+    private final JdbcGenreRepository genreRepository;
+    private final JdbcMpaRepository mpaRepository;
+    private final JdbcUserRepository userRepository;
 
     public Collection<Film> findAll() {
-        return filmStorage.findAll();
+        return filmRepository.findAll();
     }
 
     public Film create(Film film) {
@@ -27,7 +32,9 @@ public class FilmService {
             log.error("Ошибка при добавлении");
             throw new ValidationException("Неверная дата фильма!");
         }
-        return filmStorage.create(film);
+        genreRepository.genreChecker(film.getGenres());
+        mpaRepository.mpaChecker(film.getMpa().getId());
+        return filmRepository.create(film);
     }
 
     public Film update(Film film) {
@@ -54,33 +61,30 @@ public class FilmService {
             log.error("У фильма не должно быть пустого описания");
             throw new ValidationException("Пустое описание");
         }
-        return filmStorage.update(film);
+        genreRepository.genreChecker(film.getGenres());
+        mpaRepository.mpaChecker(film.getMpa().getId());
+
+        return filmRepository.update(film);
     }
 
     public Film getFilmById(Long id) {
-        if (filmStorage.getFilmById(id) == null) throw new NotFoundException("Такого фильма не существует");
-        return filmStorage.getFilmById(id);
+        return filmRepository.getFilmById(id);
     }
 
     public Collection<Film> getPopularFilms(Long count) {
         log.info("Получение популярных фильмов");
-        return filmStorage.findAll().stream().sorted((film1, film2) -> (film2.getLikes().size() - film1.getLikes().size()))
-                .limit(count)
-                .toList();
+        return filmRepository.getPopularFilms(count);
     }
 
     public void addLike(Long id, Long userId) {
         log.info("добавление лайка");
-        userService.getUserById(userId); //внутри проверка на существование такого пользователя
-        Film film = getFilmById(id);
-        film.getLikes().add(userId);
+        userRepository.getUserById(userId);
+        filmRepository.addLike(id, userId);
     }
 
     public void deleteLike(Long id, Long userId) {
         log.info("удаление лайка");
-        userService.getUserById(userId); //проверка на существование
-        Film film = getFilmById(id);
-        if (!film.getLikes().contains(userId)) throw new NotFoundException("Пользователь не ставил лайк фильму");
-        film.getLikes().remove(userId);
+        userRepository.getUserById(userId); //проверка на существование;
+        filmRepository.removeLike(id, userId);
     }
 }

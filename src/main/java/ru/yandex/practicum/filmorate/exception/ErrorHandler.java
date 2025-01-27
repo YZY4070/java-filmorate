@@ -37,4 +37,10 @@ public class ErrorHandler {
     public ErrorResponse handleNegative(NegativeCountException e) {
         return new ErrorResponse("Need positive number", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleServerError(InternalServerException e) {
+        return new ErrorResponse("Internal server error", e.getMessage());
+    }
 }
